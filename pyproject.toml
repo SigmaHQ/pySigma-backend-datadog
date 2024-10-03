@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pySigma-backend-datadog"
-version = "0.1.1"
+version = "0.1.2"
 description = "pySigma Datadog backend"
 readme = "README.md"
 authors = ["Datadog Cloud SIEM <team-cloudsiembackend@datadoghq.com>"]
