@@ -32,10 +32,9 @@ class DatadogFieldMappingTransformation(FieldMappingTransformation):
         queries.
         """
         mapping = self.mapping.get(field)
-        if not mapping:
+        if not mapping and field:
             return f"@{field}"
-        else:
-            return mapping
+        return mapping
 
 
 def datadog_pipeline() -> ProcessingPipeline:
