@@ -74,7 +74,7 @@ class DatadogBackend(TextQueryBackend):
     wildcard_multi: ClassVar[str] = "*"  # Character used as multi-character wildcard
     wildcard_single: ClassVar[str] = "*"  # Character used as single-character wildcard
     add_escaped: ClassVar[str] = (
-        ' + - = && || ! ( ) { } [ ] < > ^ “ ” ~ * ? : " # '  # Characters quoted in addition to wildcards and string quote
+        ' + - = && || ! ( ) { } [ ] < > ^ “ ” ~ * ? " # '  # Characters quoted in addition to wildcards and string quote
     )
     bool_values: ClassVar[Dict[bool, str]] = {
         True: "true",
