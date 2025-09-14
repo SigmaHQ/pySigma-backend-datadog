@@ -13,7 +13,7 @@ from sigma.rule import SigmaRule
 
 class AggregateRuleProcessingCondition(RuleProcessingCondition):
     def match(
-        self, pipeline: "sigma.processing.pipeline.ProcessingPipeline", rule: SigmaRule
+        self, rule: SigmaRule
     ) -> bool:
         """Match condition on Sigma rule."""
         agg_function_strings = ["| count", "| min", "| max", "| avg", "| sum", "| near"]
