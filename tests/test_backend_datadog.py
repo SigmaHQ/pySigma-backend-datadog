@@ -389,7 +389,7 @@ def test_cloudtrail_rule(datadog_backend: DatadogBackend):
         "type": "log_detection",
         "queries": [
             {
-                "query": "source:cloudtrail @userIdentity.type:Root AND (NOT @evt.type:AwsServiceEvent)",
+                "query": "source:cloudtrail @userIdentity.type:Root AND (NOT @eventType:AwsServiceEvent)",
                 "groupByFields": ["@userIdentity.arn"],
                 "distinctFields": [],
             }

@@ -1,19 +1,16 @@
 # pylint: disable=too-many-lines
-import re
-from typing import ClassVar, Dict, Tuple, Pattern, List, Optional, Any, Union
-
 import json
+import re
+from typing import Any, ClassVar, Dict, List, Optional, Pattern, Tuple, Union
 
-from sigma.conversion.state import ConversionState
-from sigma.rule import SigmaRule
+from sigma.conditions import ConditionAND, ConditionItem, ConditionNOT, ConditionOR
 from sigma.conversion.base import TextQueryBackend
-
-from sigma.processing.pipeline import ProcessingPipeline
-from sigma.conditions import ConditionItem, ConditionAND, ConditionOR, ConditionNOT
-from sigma.types import SigmaCompareExpression, SigmaRegularExpression
+from sigma.conversion.state import ConversionState
 from sigma.exceptions import SigmaFeatureNotSupportedByBackendError
-
 from sigma.pipelines.datadog import datadog_pipeline
+from sigma.processing.pipeline import ProcessingPipeline
+from sigma.rule import SigmaRule
+from sigma.types import SigmaCompareExpression, SigmaRegularExpression
 
 
 class DatadogBackend(TextQueryBackend):
@@ -67,7 +64,7 @@ class DatadogBackend(TextQueryBackend):
     )
 
     field_escape_pattern: ClassVar[Pattern] = re.compile(
-        "[\\s*]"
+        "[\\s]"
     )  # All matches of this pattern are prepended with the string contained in field_escape.
 
     ## Values
@@ -77,20 +74,20 @@ class DatadogBackend(TextQueryBackend):
     wildcard_multi: ClassVar[str] = "*"  # Character used as multi-character wildcard
     wildcard_single: ClassVar[str] = "*"  # Character used as single-character wildcard
     add_escaped: ClassVar[str] = (
-        ' + - = && || ! ( ) { } [ ] < > ^ “ ” ~ * ? : " '  # Characters quoted in addition to wildcards and string quote
+        ' + - = && || ! ( ) { } [ ] < > ^ “ ” ~ * ? " # '  # Characters quoted in addition to wildcards and string quote
     )
-    bool_values: ClassVar[Dict[bool, str]] = (
-        {  # Values to which boolean values are mapped.
-            True: "true",
-            False: "false",
-        }
-    )
+    bool_values: ClassVar[Dict[bool, str]] = {
+        True: "true",
+        False: "false",
+    }  # Values to which boolean values are mapped.
 
     # String matching operators. if none is appropriate eq_token is used.
     startswith_expression: ClassVar[str] = "{field}:{value}*"
     endswith_expression: ClassVar[str] = "{field}:*{value}"
     contains_expression: ClassVar[str] = "{field}:*{value}*"
     icontains_token: ClassVar[str] = "{field}:*{value}*"
+
+    re_escape_char: ClassVar[str] = "\\"
 
     # Numeric comparison operators
     compare_op_expression: ClassVar[str] = (
@@ -105,17 +102,22 @@ class DatadogBackend(TextQueryBackend):
     }
 
     # Expression for comparing two event fields
+    # Expression for comparing two event fields
     field_equals_field_expression: ClassVar[Optional[str]] = (
-        None  # Field comparison expression with the placeholders {field1} and {field2} corresponding to left field and right value side of Sigma detection item
+        "{field1}:{field2}"  # Field comparison expression with the placeholders {field1} and {field2} corresponding to left field and right value side of Sigma detection item
     )
     field_equals_field_escaping_quoting: Tuple[bool, bool] = (
         True,
         True,
     )  # If regular field-escaping/quoting is applied to field1 and field2. A custom escaping/quoting can be implemented in the convert_condition_field_eq_field_escape_and_quote method.
 
+    # Null/None expressions
+    # https://datadoghq.atlassian.net/wiki/spaces/TS/pages/454787474/Log+search+syntax+101#Searching-for-logs-that-don%E2%80%99t-have-a-specific-value-(same-for-attributes)
+    field_null_expression: ClassVar[str] = "-{field}:[0* TO z*] AND {field}:*"
+
     # Field existence condition expressions.
     field_exists_expression: ClassVar[str] = (
-        "({field})"  # Expression for field existence as format string with {field} placeholder for field name
+        "{field}:*"  # Expression for field existence as format string with {field} placeholder for field name
     )
     field_not_exists_expression: ClassVar[str] = (
         "NOT ({field})"  # Expression for field non-existence as format string with {field} placeholder for field name. If not set, field_exists_expression is negated with boolean NOT.
