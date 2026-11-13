@@ -98,7 +98,7 @@ class DatadogBackend(TextQueryBackend):
         SigmaCompareExpression.CompareOperators.GT: ">",
         SigmaCompareExpression.CompareOperators.GTE: ">=",
         SigmaCompareExpression.CompareOperators.LT: "<",
-        SigmaCompareExpression.CompareOperators.LTE: ">=",
+        SigmaCompareExpression.CompareOperators.LTE: "<=",
     }
 
     # Expression for comparing two event fields
