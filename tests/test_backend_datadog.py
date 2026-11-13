@@ -250,6 +250,36 @@ def test_datadog_field_name_with_whitespace(datadog_backend: DatadogBackend):
 
 
 #################################### Sigma to Datadog Rule Conversion Tests ##########################################
+
+@pytest.mark.parametrize(
+    "modifier,expected_operator",
+    [
+        ("lt", "<"),
+        ("lte", "<="),
+        ("gt", ">"),
+        ("gte", ">="),
+    ],
+)
+def test_datadog_numeric_comparison_operators(
+    datadog_backend: DatadogBackend, modifier, expected_operator
+):
+    assert datadog_backend.convert(
+        SigmaCollection.from_yaml(
+            f"""
+                title: Test DD Numeric Comparison
+                status: test
+                logsource:
+                    service: cloudtrail
+                    product: aws
+                detection:
+                    sel:
+                        fieldA|{modifier}: 5
+                    condition: sel
+            """
+        )
+    ) == [f"@fieldA:{expected_operator}5"]
+
+
 def test_datadog_siem_rule_output(datadog_backend: DatadogBackend):
     sigma_rule = SigmaCollection.from_yaml(
         """
